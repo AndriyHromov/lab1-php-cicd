@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+/**
+ * Простий калькулятор; проблеми форматування виправлено (issue #4).
+ */
 class Calculator
 {
     public function add($x, $y)
