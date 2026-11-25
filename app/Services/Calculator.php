@@ -9,7 +9,7 @@ class Calculator
 {
     public function add($x, $y)
     {
-        return $x + $y; // порушення стандарту форматування, яке знайде Pint
+        return $x+$y; // тимчасово відновлено для демонстрації заблокованого Merge
     }
 
     public function subtract($x, $y)
