@@ -2,9 +2,7 @@
 
 Мінімальний PHP-проєкт для лабораторної роботи №1 «Керування версіями та налаштування CI/CD пайплайну для PHP-проєкту».
 
-<!-- Stage 5: вставте сюди скопійований з Actions бейдж статусу, наприклад:
-[![PHP CI Application](https://github.com/<user>/<repo>/actions/workflows/php-ci.yml/badge.svg)](https://github.com/<user>/<repo>/actions/workflows/php-ci.yml)
--->
+[![PHP CI Application](https://github.com/AndriyHromov/lab1-php-cicd/actions/workflows/php-ci.yml/badge.svg)](https://github.com/AndriyHromov/lab1-php-cicd/actions/workflows/php-ci.yml)
 
 ## Функціонал
 
