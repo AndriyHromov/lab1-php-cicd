@@ -1,0 +1,229 @@
+@startuml
+title Діаграма класів — Система оплати комунальних послуг
+skinparam defaultFontName Arial
+skinparam classFontSize 9
+skinparam nodesep 8
+skinparam ranksep 12
+hide circle
+left to right direction
+
+class User {
+  +id: int
+  +name: String
+  +email: String
+  +passwordHash: String
+  +role: String
+  +createdAt: DateTime
+  +authenticate(email: String, password: String): bool
+  +logout(): void
+  +updateProfile(data: array): bool
+  +getRole(): String
+  +hasPermission(permission: String): bool
+}
+
+class Consumer {
+  +userId: int
+  +address: String
+  +phone: String
+  +passport: String
+  +balance: Decimal
+  +getAccounts(): array
+  +submitReading(meterId: int, value: Decimal): bool
+  +payInvoice(invoiceId: int, amount: Decimal): Payment
+  +getDebt(): Decimal
+  +receiveNotification(message: String): void
+}
+
+class Operator {
+  +userId: int
+  +employeeNumber: String
+  +department: String
+  +shift: String
+  +isActive: bool
+  +findAccount(query: String): array
+  +registerPayment(payment: Payment): bool
+  +printReceipt(invoiceId: int): void
+  +createInvoice(accountId: int): Invoice
+  +updateReading(reading: MeterReading): bool
+}
+
+class Administrator {
+  +adminLevel: int
+  +permissions: array
+  +lastLoginAt: DateTime
+  +emailAlerts: bool
+  +canExport: bool
+  +manageTariff(tariff: Tariff): bool
+  +manageUser(user: User): bool
+  +generateReport(type: String): Report
+  +backupDatabase(): bool
+  +viewAuditLog(): array
+}
+
+class Provider {
+  +id: int
+  +name: String
+  +edrpou: String
+  +address: String
+  +bankAccount: String
+  +isActive: bool
+  +getAccounts(): array
+  +getTariffs(): array
+  +addTariff(tariff: Tariff): bool
+  +sendNotification(to: Consumer, text: String): bool
+  +getRevenue(from: DateTime, to: DateTime): Decimal
+}
+
+class Account {
+  +id: int
+  +number: String
+  +consumerId: int
+  +providerId: int
+  +address: String
+  +status: String
+  +balance: Decimal
+  +getInvoices(): array
+  +getMeters(): array
+  +getPayments(): array
+  +calculateDebt(): Decimal
+  +changeStatus(status: String): bool
+}
+
+class Meter {
+  +id: int
+  +serialNumber: String
+  +accountId: int
+  +type: String
+  +installedAt: DateTime
+  +isActive: bool
+  +getReadings(): array
+  +addReading(reading: MeterReading): bool
+  +getLastReading(): MeterReading
+  +calculateConsumption(): Decimal
+  +deactivate(): void
+}
+
+class MeterReading {
+  +id: int
+  +meterId: int
+  +value: Decimal
+  +readingDate: DateTime
+  +period: String
+  +source: String
+  +validate(): bool
+  +getPrevious(): MeterReading
+  +getConsumption(): Decimal
+  +save(): bool
+  +delete(): bool
+}
+
+class Tariff {
+  +id: int
+  +providerId: int
+  +name: String
+  +pricePerUnit: Decimal
+  +unit: String
+  +effectiveFrom: DateTime
+  +isActive: bool
+  +getPrice(): Decimal
+  +updatePrice(price: Decimal): bool
+  +isEffectiveAt(date: DateTime): bool
+  +deactivate(): void
+  +calculateCost(usage: Decimal): Decimal
+}
+
+class Invoice {
+  +id: int
+  +accountId: int
+  +period: String
+  +issuedAt: DateTime
+  +dueDate: DateTime
+  +total: Decimal
+  +status: String
+  +getLines(): array
+  +addLine(line: InvoiceLine): bool
+  +calculateTotal(): Decimal
+  +markPaid(): bool
+  +generatePdf(): String
+}
+
+class InvoiceLine {
+  +id: int
+  +invoiceId: int
+  +tariffId: int
+  +quantity: Decimal
+  +unitPrice: Decimal
+  +amount: Decimal
+  +getAmount(): Decimal
+  +setQuantity(q: Decimal): void
+  +applyTariff(tariff: Tariff): void
+  +validate(): bool
+  +toArray(): array
+}
+
+class Payment {
+  +id: int
+  +invoiceId: int
+  +amount: Decimal
+  +paidAt: DateTime
+  +method: String
+  +transactionId: String
+  +status: String
+  +confirm(): bool
+  +refund(): bool
+  +getReceipt(): String
+  +isSuccessful(): bool
+  +notifyConsumer(): bool
+}
+
+class Notification {
+  +id: int
+  +consumerId: int
+  +channel: String
+  +subject: String
+  +body: String
+  +sentAt: DateTime
+  +isRead: bool
+  +send(): bool
+  +markRead(): void
+  +getHistory(): array
+  +renderTemplate(data: array): String
+  +schedule(when: DateTime): bool
+}
+
+class Report {
+  +id: int
+  +type: String
+  +period: String
+  +generatedAt: DateTime
+  +generatedBy: int
+  +format: String
+  +rowsCount: int
+  +generate(): bool
+  +export(format: String): String
+  +filter(criteria: array): array
+  +getSummary(): array
+  +download(): void
+}
+
+' Узагальнення (generalization)
+Consumer --|> User
+Operator --|> User
+Administrator --|> Operator
+
+' Агрегація (aggregation)
+Provider "1" o-- "0..*" Account : обслуговує
+
+' Композиція (composition)
+Account "1" *-- "1..*" Meter : містить
+Account "1" *-- "0..*" Invoice : виставляє
+Invoice "1" *-- "1..*" InvoiceLine : включає
+
+' Асоціації (association)
+User "1" --> "0..*" Payment : здійснює
+Meter "1" --> "0..*" MeterReading : має
+Tariff "1" --> "0..*" InvoiceLine : застосовується
+Invoice "1" --> "0..1" Payment : оплачується
+Consumer "1" --> "0..*" Notification : отримує
+Administrator "1" --> "0..*" Report : формує
+@enduml
