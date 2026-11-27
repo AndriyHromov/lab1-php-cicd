@@ -1,0 +1,57 @@
+@startuml
+title Діаграма варіантів використання — Система оплати комунальних послуг
+skinparam defaultFontName Arial
+skinparam fontsize 11
+left to right direction
+
+actor "Споживач" as Consumer
+actor "Оператор" as Operator
+actor "Адміністратор" as Admin
+
+' Узагальнення акторів: адміністратор виконує також функції оператора
+Admin --|> Operator : узагальнення акторів
+
+rectangle "Система оплати комунальних послуг" {
+  usecase "Увійти в систему" as UC_Login
+  usecase "Переглянути нарахування" as UC_ViewCharges
+  usecase "Оплатити рахунок" as UC_Pay
+  usecase "Ввести показання лічильника" as UC_Meter
+  usecase "Знайти рахунок" as UC_Find
+  usecase "Знайти за номером" as UC_FindNumber
+  usecase "Знайти за адресою" as UC_FindAddress
+  usecase "Зареєструвати платіж" as UC_RegisterPayment
+  usecase "Сформувати квитанцію" as UC_Receipt
+  usecase "Нарахувати пеню" as UC_Penalty
+  usecase "Керувати тарифами" as UC_Tariffs
+  usecase "Сформувати звіт" as UC_Report
+  usecase "Керувати користувачами" as UC_Users
+  usecase "Оплатити карткою" as UC_Card
+}
+
+' Узагальнення варіантів використання
+UC_FindNumber --|> UC_Find
+UC_FindAddress --|> UC_Find
+
+' Включення (include)
+UC_Pay ..> UC_Login : <<include>>
+UC_ViewCharges ..> UC_Find : <<include>>
+UC_Report ..> UC_Find : <<include>>
+
+' Розширення (extend)
+UC_Card ..> UC_Pay : <<extend>>
+UC_Penalty ..> UC_Receipt : <<extend>>
+
+' Асоціації акторів із варіантами використання
+Consumer --> UC_Login
+Consumer --> UC_ViewCharges
+Consumer --> UC_Pay
+Consumer --> UC_Meter
+
+Operator --> UC_Find
+Operator --> UC_RegisterPayment
+Operator --> UC_Receipt
+
+Admin --> UC_Tariffs
+Admin --> UC_Report
+Admin --> UC_Users
+@enduml
